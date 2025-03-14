@@ -29,9 +29,9 @@ function ProtectedRoute({ children }) {
     },
     {
       title: "Profile",
-      paths: ["/profile"],
+      paths: ["/user/profile"],
       icon: <i className="ri-user-line"></i>,
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/user/profile"),
     },
     {
       title: "Logout",
@@ -53,9 +53,15 @@ function ProtectedRoute({ children }) {
     },
     {
       title: "Exams",
-      paths: ["/admin/exams", "/admin/exams/add"],
+      paths: ["/admin/exams", "/admin/exams/add","/admin/exam/edit"],
       icon: <i className="ri-file-list-3-line"></i>,
       onClick: () => navigate("/admin/exams"),
+    },
+    {
+      title: "AI",
+      paths: ["/ai-generate"],
+      icon: <i className="ri-bard-line"></i>,
+      onClick: () => navigate("/admin/ai-generate"),
     },
     {
       title: "Reports",
@@ -65,9 +71,9 @@ function ProtectedRoute({ children }) {
     },
     {
       title: "Profile",
-      paths: ["/profile"],
+      paths: ["/admin/profile"],
       icon: <i className="ri-user-line"></i>,
-      onClick: () => navigate("/profile"),
+      onClick: () => navigate("/admin/profile"),
     },
     {
       title: "Logout",
@@ -127,6 +133,14 @@ function ProtectedRoute({ children }) {
       if (
         activeRoute.includes("/user/write-exam") &&
         paths.includes("/user/write-exam")
+      ) {
+        return true;
+      }
+
+      // Check if the active route is for AI Generate
+      if (
+        activeRoute.includes("/admin/ai-generate") &&
+        paths.includes("/ai-generate")
       ) {
         return true;
       }

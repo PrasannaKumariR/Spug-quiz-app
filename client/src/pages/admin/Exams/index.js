@@ -104,6 +104,7 @@ function Exams() {
           <i className="ri-add-line"></i>
           Add Exam
         </button>
+        
       </div>
       <div className="divider"></div>
 

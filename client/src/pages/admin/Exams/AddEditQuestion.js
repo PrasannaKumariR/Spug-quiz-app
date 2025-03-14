@@ -1,6 +1,7 @@
+//addeditqstn
 import { Form, Modal, message } from "antd";
 import React from "react";
-import { addQuestionToExam, editQuestionById  } from "../../../apicalls/exams";
+import { addQuestionToExam, editQuestionById } from "../../../apicalls/exams";
 import { useDispatch } from "react-redux";
 import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
 
@@ -108,9 +109,7 @@ function AddEditQuestion({
           <button className="primary-contained-btn" type="submit">
             Save
           </button>
-          <button className="primary-contained-btn" type="submit">
-            Generate AI-Question
-          </button>
+          
         </div>
       </Form>
     </Modal>
@@ -118,3 +117,6 @@ function AddEditQuestion({
 }
 
 export default AddEditQuestion;
+
+
+

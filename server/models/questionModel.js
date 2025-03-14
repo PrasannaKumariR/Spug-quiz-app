@@ -18,6 +18,7 @@ const questionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "exams",
     },
+    isGenerated: { type: Boolean, default: false }, // To mark AI-generated questions
   },
   {
     timestamps: true,

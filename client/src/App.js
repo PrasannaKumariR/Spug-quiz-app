@@ -17,6 +17,9 @@ import { useSelector } from "react-redux";
 import WriteExam from "./pages/user/WriteExam";
 import UserReports from "./pages/user/userReports.js";
 import AdminReports from "./pages/admin/AdminReports/index.js";
+import AIgenerate from "./pages/admin/aiGenerate.js/index.js";
+import UserProfile from "./pages/user/UserProfile/index.js";
+import AdminProfile from "./pages/admin/AdminProfile/index.js";
 
 function App() {
   const { loading } = useSelector((state) => state.loader);
@@ -28,7 +31,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
           {/* User routes */}
           <Route
             path="/"
@@ -38,7 +40,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/user/write-exam/:id"
             element={
@@ -48,6 +49,15 @@ function App() {
             }
           />
 
+          {/*  */}
+          <Route
+            path="/user/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/user/reports"
             element={
@@ -56,7 +66,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Admin routes */}
           <Route
             path="/admin/exams"
@@ -66,7 +75,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* */}
           <Route
             path="/admin/exams/add"
@@ -76,13 +84,30 @@ function App() {
               </ProtectedRoute>
             }
           />
-
-          {/*  */}
           <Route
             path="/admin/exams/edit/:id"
             element={
               <ProtectedRoute>
                 <AddEditExam />
+              </ProtectedRoute>
+            }
+          />
+
+          {/*  */}
+          <Route
+            path="/admin/ai-generate"
+            element={
+              <ProtectedRoute>
+                <AIgenerate />
+              </ProtectedRoute>
+            }
+          />
+          {/*  */}
+          <Route
+            path="/admin/profile"
+            element={
+              <ProtectedRoute>
+                <AdminProfile />
               </ProtectedRoute>
             }
           />
