@@ -3,8 +3,8 @@ import axios from "axios";
 
 function App() {
   const [topic, setTopic] = useState("");
-  const [numQuestions, setNumQuestions] = useState(5);
-  const [difficulty, setDifficulty] = useState("medium");
+  const [numQuestions, setNumQuestions] = useState();
+  const [difficulty, setDifficulty] = useState("");
   const [quiz, setQuiz] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,6 +27,16 @@ function App() {
       setError("Failed to generate quiz. Please try again.");
     }
     setLoading(false);
+  };
+
+   // Function to download the generated quiz as a .txt file
+   const downloadQuiz = () => {
+    const element = document.createElement("a");
+    const file = new Blob([quiz], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${topic}_quiz.txt`;
+    document.body.appendChild(element); // Required for this to work in Firefox
+    element.click();
   };
 
   return (
@@ -127,6 +137,23 @@ function App() {
           >
             <pre>{quiz}</pre>
           </div>
+           {/* Download Button */}
+           {quiz && (
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <button
+                onClick={downloadQuiz}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Download Quiz
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

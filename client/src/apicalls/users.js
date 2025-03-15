@@ -45,3 +45,4 @@ export const updateUserProfile = async (userData) => {
     throw error;
   }
 };
+

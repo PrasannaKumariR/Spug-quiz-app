@@ -1,99 +1,182 @@
-import React, { useEffect, useState } from "react";
-import { Form } from "antd";
-import { message } from "antd";
-import { useDispatch } from "react-redux";
-import { HideLoading, ShowLoading } from "../../../redux/loaderSlice";
-import { updateUserProfile, getUserProfile } from "../../../apicalls/users"; // Import the getUserProfile API
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function ProfileUpdate() {
-  const dispatch = useDispatch();
-  const [form] = Form.useForm(); // Ant Design form instance
-  const [userData, setUserData] = useState(null); // Store the user data
+const Profile = () => {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '' });
 
-  // Fetch user profile on component mount
+  // Fetch profile information on component mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        dispatch(ShowLoading());
-        const response = await getUserProfile(); // Fetch the user profile data
-        dispatch(HideLoading());
-        if (response.success) {
-          setUserData(response.data); // Set the fetched user data to state
-          form.setFieldsValue({
-            name: response.data.name,
-            email: response.data.email,
-          }); // Prefill the form fields
+        const token = localStorage.getItem('token');
+        const response = await axios.post('/api/users/get-user-info', {}, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.data.success) {
+          setProfile(response.data.data);
+          setFormData({
+            name: response.data.data.name,
+            email: response.data.data.email,
+          });
         } else {
-          message.error(response.message);
+          setError(response.data.message);
         }
-      } catch (error) {
-        message.error("Failed to fetch user profile.");
-        dispatch(HideLoading());
+      } catch (err) {
+        setError('Failed to fetch profile data');
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProfile();
-  }, [dispatch, form]);
 
-  const onFinish = async (values) => {
+    fetchProfile();
+  }, []);
+
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle form submission to update the profile
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
     try {
-      dispatch(ShowLoading());
-      const response = await updateUserProfile(values); // Update user profile function
-      dispatch(HideLoading());
-      if (response.success) {
-        message.success("Profile updated successfully!"); // display success message
+      const token = localStorage.getItem('token');
+      const response = await axios.put('/api/users/update-profile', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data.success) {
+        setProfile(response.data.data);
+        setEditMode(false);
       } else {
-        message.error(response.message); // display error message
+        setError(response.data.message);
       }
-    } catch (error) {
-      message.error(error.message);
-      dispatch(HideLoading());
+    } catch (err) {
+      setError('Failed to update profile');
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Toggle edit mode
+  const toggleEditMode = () => {
+    setEditMode((prev) => !prev);
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
-    <div className="flex justify-center items-center h-100 w-100 bg-white">
-      <div className="card w-400 p-3 bg-white mt-2">
-        <div className="flex flex-col">
-          <div className="flex">
-            <h2 className="txt-2xl">
-              UPDATE PROFILE <i className="ri-user-settings-line"></i>
-            </h2>
-          </div>
-          <div className="divider"></div>
-          <Form
-            form={form} // Attach the form instance
-            layout="vertical"
-            className="mt-2"
-            onFinish={onFinish}
-            initialValues={userData} // Set initial values
-          >
-            <Form.Item
+    <div className="profile-page" style={styles.container}>
+      <h2 style={styles.heading}>Profile</h2>
+      {editMode ? (
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Name:</label>
+            <input
+              type="text"
               name="name"
-              label="Name"
-              rules={[{ required: true, message: "Please enter your name" }]}
-            >
-              <input type="text" placeholder="Enter your name" />
-            </Form.Item>
-            <Form.Item
+              value={formData.name}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Email:</label>
+            <input
+              type="email"
               name="email"
-              label="Email"
-              rules={[{ required: true, message: "Please enter your email" }]}
-            >
-              <input type="text" placeholder="Enter your email" />
-            </Form.Item>
-            <Form.Item name="password" label="Password">
-              <input type="password" placeholder="Enter a new password" />
-            </Form.Item>
-            <div className="flex flex-col gap-2">
-              <button type="submit" className="primary-contained-btn mt-2 w-100">
-                Update Profile
-              </button>
-            </div>
-          </Form>
+              value={formData.email}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+          <button type="submit" style={styles.button}>Save</button>
+          <button type="button" onClick={toggleEditMode} style={styles.buttonCancel}>Cancel</button>
+        </form>
+      ) : (
+        <div style={styles.profileInfo}>
+          <p><strong>Name:</strong> {profile.name}</p>
+          <p><strong>Email:</strong> {profile.email}</p>
+          <p><strong>Admin:</strong> {profile.isAdmin ? 'Yes' : 'No'}</p>
+          <p><strong>Joined:</strong> {new Date(profile.createdAt).toLocaleDateString()}</p>
+          <button onClick={toggleEditMode} style={styles.button}>Edit Profile</button>
         </div>
-      </div>
+      )}
     </div>
   );
-}
+};
 
-export default ProfileUpdate;
+// Styling that matches the login theme
+const styles = {
+  container: {
+    backgroundColor: '#0f3640',  // Dark teal background
+    color: '#FFFFFF',  // White text for contrast
+    padding: '20px',
+    borderRadius: '10px',
+    width: '300px',
+    margin: '0 auto',
+    marginTop: '50px',
+    boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+  },
+  heading: {
+    textAlign: 'center',
+    fontSize: '24px',
+    marginBottom: '20px',
+    borderBottom: '1px solid #ffffff',  // Underline effect
+    paddingBottom: '10px',
+  },
+  profileInfo: {
+    textAlign: 'left',
+    fontSize: '18px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  formGroup: {
+    marginBottom: '10px',
+  },
+  label: {
+    marginBottom: '5px',
+    fontWeight: 'bold',
+  },
+  input: {
+    padding: '8px',
+    borderRadius: '5px',
+    border: '1px solid #ffffff',
+    color: '#0f3640',
+    width: '100%',
+  },
+  button: {
+    padding: '10px',
+    backgroundColor: '#00b894',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '10px',
+  },
+  buttonCancel: {
+    padding: '10px',
+    backgroundColor: '#d63031',
+    color: '#FFFFFF',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    marginTop: '10px',
+  }
+};
+
+export default Profile;

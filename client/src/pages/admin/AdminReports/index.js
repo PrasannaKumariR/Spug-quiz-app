@@ -107,7 +107,10 @@ function AdminReports() {
         >
           Clear
         </button>
-        <button className="primary-contained-btn" onClick={() => getData(filters)}>
+        <button
+          className="primary-contained-btn"
+          onClick={() => getData(filters)}
+        >
           Search
         </button>
       </div>

@@ -122,7 +122,26 @@ router.post("/get-user-info", authMiddleware, async (req, res) => {
   }
 });
 
+//update-profile
+router.put('/update-profile', authMiddleware, async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const userId = req.body.userId;
 
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email },
+      { new: true, runValidators: true }
+    );
 
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    res.status(200).json({ success: true, message: 'Profile updated successfully.', data: updatedUser });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'An error occurred while updating the profile.' });
+  }
+});
 
 module.exports = router;
